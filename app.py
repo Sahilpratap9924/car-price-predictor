@@ -6,7 +6,7 @@ st.set_page_config(page_title="Car Price Predictor", page_icon="🚗", layout="c
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv('cleaned_car.csv')
+    df = pd.read_csv('Cleaned_car.csv')
     if 'Unnamed: 0' in df.columns:
         df = df.drop(columns=['Unnamed: 0'])
     return df
