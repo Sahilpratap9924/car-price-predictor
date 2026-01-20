@@ -1,23 +1,53 @@
+import os
 import streamlit as st
 import pandas as pd
-import pickle
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import Pipeline
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "cleaned_car.csv")
 
 st.set_page_config(page_title="Car Price Predictor", page_icon="🚗", layout="centered")
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv('Cleaned_car.csv')
-    if 'Unnamed: 0' in df.columns:
-        df = df.drop(columns=['Unnamed: 0'])
+    df = pd.read_csv(DATA_PATH)
+    if "Unnamed: 0" in df.columns:
+        df = df.drop(columns=["Unnamed: 0"])
     return df
 
 @st.cache_resource
-def load_model():
-    with open('LinearRegressionModel.pkl', 'rb') as f:
-        return pickle.load(f)
+def train_model(df):
+    X = df[['name', 'company', 'year', 'kms_driven', 'fuel_type']]
+    y = df['Price']
 
+    cat_cols = ['name', 'company', 'fuel_type']
+    num_cols = ['year', 'kms_driven']
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('cat', OneHotEncoder(handle_unknown='ignore'), cat_cols),
+            ('num', 'passthrough', num_cols)
+        ]
+    )
+
+    model = LinearRegression()
+
+    pipe = Pipeline(steps=[
+        ('preprocess', preprocessor),
+        ('model', model)
+    ])
+
+    pipe.fit(X, y)
+    return pipe
+
+
+# ---------- Load data & model ----------
 car = load_data()
-model = load_model()
+model = train_model(car)
+
 
 st.markdown("<h1 style='text-align: center;'>🚗 Car Price Predictor</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: grey;'>ML model using OneHotEncoder + Pipeline</p>", unsafe_allow_html=True)
