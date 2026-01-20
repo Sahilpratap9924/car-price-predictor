@@ -7,7 +7,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(BASE_DIR, "cleaned_car.csv")
+DATA_PATH = os.path.join(BASE_DIR, "Cleaned_car.csv")
 
 st.set_page_config(page_title="Car Price Predictor", page_icon="🚗", layout="centered")
 
